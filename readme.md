@@ -28,8 +28,8 @@ pip install -r requirements.txt
 Make the script executable and run it to download required models:
 
 ```bash
-chmod +x setup_models.sh
-./setup_models.sh
+chmod +x download_models
+./download_models
 ```
 
 ---
