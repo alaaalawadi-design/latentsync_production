@@ -2,3 +2,7 @@ checkpoints/**
 temp/**
 **/__pycache__/
 data/ref_videos/ref_frames.pkl
+data/intermediate_videos/**
+data/results/**
+data/tmp/**
+file.txt
