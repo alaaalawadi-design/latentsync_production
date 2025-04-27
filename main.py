@@ -78,16 +78,15 @@ class App:
 if __name__ == "__main__":
     
     base_dir=Path('.')
-    models_dir = Path('./checkpoints')    
+    models_dir = Path('/media/ehab/46EEC3E77E2602C6/Cyshield/LatentSync/checkpoints')    
     project_manager = ProjectManager(base_dir, models_dir)
     lipsync_app = App(project_manager)
     
     
     import time 
     s_time = time.time()
-    # audio_path = "../test_data/audios/03502.wav"
-    audio_path = "../test_data/audios/audio1.wav"
-    save_path = "../test_data/results/1.mp4"
+    audio_path = "/home/ehab/Downloads/audio2.wav"
+    save_path = "/home/ehab/Downloads/out_morning.mp4"
     project_manager.set_audio_path(audio_path)
     project_manager.set_save_path(save_path)
     lipsync_app.run()    
@@ -96,8 +95,8 @@ if __name__ == "__main__":
     
     s_time = time.time()
     # audio_path = "../test_data/audios/03052.wav"
-    audio_path = "../test_data/audios/audio2.wav"
-    save_path = "../test_data/results/2.mp4"
+    audio_path = "/home/ehab/Downloads/audio2.wav"
+    save_path = "/home/ehab/Downloads/2.mp4"
     project_manager.set_audio_path(audio_path)
     project_manager.set_save_path(save_path)
     lipsync_app.run()    

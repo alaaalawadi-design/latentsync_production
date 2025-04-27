@@ -47,6 +47,6 @@ class FrameIntrpolation:
         
 if __name__ == '__main__':
     model = FrameIntrpolation('./train_log')
-    img1 = '../tmp/frame_607.png'
-    img2 = '../tmp/frame_1.png'
-    model.execute(cv2.imread(img1), cv2.imread(img2), 25, '../data/ref_videos/ref_video_connection.mp4')
+    img1 = '/media/ehab/46EEC3E77E2602C6/Cyshield/video-background-removal/videos/frames/596.png'
+    img2 = '/media/ehab/46EEC3E77E2602C6/Cyshield/video-background-removal/videos/frames/1.png'
+    model.execute(cv2.imread(img1), cv2.imread(img2), 10, '/media/ehab/46EEC3E77E2602C6/Cyshield/video-background-removal/videos/ref_video_connection.mp4')
