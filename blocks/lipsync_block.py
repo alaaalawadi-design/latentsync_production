@@ -16,8 +16,8 @@ class LibSyncBlock:
                 inference_ckpt_path,
                 whisper_small_model_path,
                 whisper_tiny_model_path,
-                ref_video_path,
-                saved_ref_video_data_path, 
+                ref_video_dir,
+                ref_video_versions,
                 device='cuda',
                 seed=None
                 ):
@@ -60,9 +60,9 @@ class LibSyncBlock:
             set_seed(seed)
         else:    
             torch.seed()
-
-        self.pipeline.prepare_ref_video(ref_video_path, saved_ref_video_data_path)
-            
+        for version in ref_video_versions:
+            self.pipeline.prepare_ref_video(os.path.join(ref_video_dir, version))
+    
     def execute(self, 
             audio_path, 
             video_out_path, 

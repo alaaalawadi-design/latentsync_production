@@ -15,6 +15,7 @@ class ProjectManager:
         self.tmp_dir = self.data_dir / "tmp"
         self.results_dir = self.data_dir / "results"
         self.intermediate_videos_dir = self.data_dir / "intermediate_videos"
+        self.ref_videos_dir = self.data_dir / "ref_videos" 
         self._ensure_dirs()
 
         # Specific file paths
@@ -22,9 +23,6 @@ class ProjectManager:
         self.inference_ckpt_path = self.models_dir / 'latentsync_unet.pt'
         self.whisper_small_model_path = self.models_dir / "whisper" / "small.pt"
         self.whisper_tiny_model_path = self.models_dir / "whisper" / "tiny.pt"
-        self.ref_video_path = self.data_dir / "ref_videos" / "ref_video_new.mp4"
-        self.saved_ref_video_data_path = self.data_dir / "ref_videos" / "ref_frames.pkl"
-        self.silent_video_path = self.data_dir / "ref_videos" / "silent.mp4"
 
 
 

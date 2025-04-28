@@ -6,3 +6,7 @@ data/intermediate_videos/**
 data/results/**
 data/tmp/**
 file.txt
+data/ref_videos/morning/ref_frames_data.pkl
+data/ref_videos/night/ref_frames_data.pkl
+data/ref_videos/noon/ref_frames_data.pkl
+data/ref_videos/sunset/ref_frames_data.pkl

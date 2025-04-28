@@ -438,16 +438,25 @@ class LipsyncPipeline(DiffusionPipeline):
         return synced_video_frames[5, :, :, :], synced_video_frames[-1, :, :, :]
 
 
-    def prepare_ref_video(self, video_path, saved_video_data_path):
+    def prepare_ref_video(self, video_dir):
+        video_path = os.path.join(video_dir, 'ref_video.mp4')
+        saved_video_data_path = os.path.join(video_dir, 'ref_frames_data.pkl')
         if not os.path.exists(saved_video_data_path):
             self.all_faces, self.all_original_video_frames, self.all_boxes, self.all_affine_matrices = self.affine_transform_video(video_path)
             with open(saved_video_data_path, "wb") as f:
                 pickle.dump([self.all_faces, self.all_original_video_frames, self.all_boxes, self.all_affine_matrices], f)    
-        else:
-            with open(saved_video_data_path, "rb") as f:
-                out_video_with_scielnt = pickle.load(f)
-            self.all_faces, self.all_original_video_frames, self.all_boxes, self.all_affine_matrices = out_video_with_scielnt
+        # else:
+        #     with open(saved_video_data_path, "rb") as f:
+        #         out_video_with_scielnt = pickle.load(f)
+        #     self.all_faces, self.all_original_video_frames, self.all_boxes, self.all_affine_matrices = out_video_with_scielnt
 
+    def prepare_ref_video_data(self, ref_video_data):
+        self.all_faces = ref_video_data['faces']
+        self.all_original_video_frames = ref_video_data['original_video_frames']
+        self.all_boxes = ref_video_data['boxes']
+        self.all_affine_matrices = ref_video_data['affine_matrices']
+    
+    
     def add_silent_to_audio(self, audio_path, audio_sample_rate, tmp_audio_path):
         audio = AudioSegment.from_file(audio_path, format="wav")
         number_of_samples = 4480
@@ -459,7 +468,7 @@ class LipsyncPipeline(DiffusionPipeline):
     def set_pointer(self, start_number):
         total_frames = len(self.all_faces)
         self.frame_pointer = start_number % total_frames
-
+        
     def set_ref_video_data(self, start=0, end=None):
         total_frames = len(self.all_faces)
 
