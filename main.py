@@ -71,7 +71,8 @@ class App:
             videos = [self.project_manager.results_dir / "output.mp4", intermediate_video2_path, self.project_manager.silent_video_path]
             speed_up_videos = [intermediate_video2_path]
 
-        self.postprocessing_block.execute(videos, speed_up_videos, output_file=self.project_manager.save_path)
+        self.postprocessing_block.execute(videos, speed_up_videos, self.project_manager.results_dir / "final_output.mp4", 
+                                          self.project_manager.background_paths, self.project_manager.save_path)
         self.cleanup()
 
 
@@ -86,55 +87,25 @@ if __name__ == "__main__":
     import time 
     s_time = time.time()
     audio_path = "/home/ehab/Downloads/audio2.wav"
-    save_path = "/home/ehab/Downloads/out_morning.mp4"
+    save_path = "/home/ehab/Downloads/results/test1"
+    backgrounds = ['morning', 'night', 'noon', 'sunset']
     project_manager.set_audio_path(audio_path)
     project_manager.set_save_path(save_path)
+    project_manager.set_background_paths(backgrounds)
     lipsync_app.run()    
     e_time = time.time()
     print(e_time-s_time)
     
+
+
+    import time 
     s_time = time.time()
-    # audio_path = "../test_data/audios/03052.wav"
-    audio_path = "/home/ehab/Downloads/audio2.wav"
-    save_path = "/home/ehab/Downloads/2.mp4"
+    audio_path = "/home/ehab/Downloads/out_7.wav"
+    save_path = "/home/ehab/Downloads/results/test1"
+    backgrounds = ['morning', 'night', 'noon', 'sunset']
     project_manager.set_audio_path(audio_path)
     project_manager.set_save_path(save_path)
+    project_manager.set_background_paths(backgrounds)
     lipsync_app.run()    
     e_time = time.time()
     print(e_time-s_time)
-    
-    # audio_path = "../test_data/audios/020.wav"
-    # save_path = "../test_data/results/3.mp4"
-    # project_manager.set_audio_path(audio_path)
-    # project_manager.set_save_path(save_path)
-    # lipsync_app.run()    
-  
-
-    # audio_path = "../test_data/audios/024.wav"
-    # save_path = "../test_data/results/4.mp4"
-    # project_manager.set_audio_path(audio_path)
-    # project_manager.set_save_path(save_path)
-    # lipsync_app.run()    
-
-  
-    # audio_path = "../test_data/audios/028.wav"
-    # save_path = "../test_data/results/5.mp4"
-    # project_manager.set_audio_path(audio_path)
-    # project_manager.set_save_path(save_path)
-    # lipsync_app.run()    
-    
-
-    # audio_path = "../test_data/audios/021.wav"
-    # save_path = "../test_data/results/6.mp4"
-    # project_manager.set_audio_path(audio_path)
-    # project_manager.set_save_path(save_path)
-    # lipsync_app.run()    
-
-
-    # audio_path = "../test_data/audios/026.wav"
-    # save_path = "../test_data/results/7.mp4"
-    # project_manager.set_audio_path(audio_path)
-    # project_manager.set_save_path(save_path)
-    # lipsync_app.run()    
-
-  
