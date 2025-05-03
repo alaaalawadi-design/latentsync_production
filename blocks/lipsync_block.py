@@ -12,6 +12,7 @@ from latentsync.whisper.audio2feature import Audio2Feature
 
 class LibSyncBlock:
     def __init__(self, 
+                base_dir,
                 unet_config_path,
                 inference_ckpt_path,
                 whisper_small_model_path,
@@ -22,7 +23,7 @@ class LibSyncBlock:
                 seed=None
                 ):
     
-        configs_dir = os.path.abspath(os.path.join(os.getcwd(), "configs"))
+        configs_dir = os.path.join(base_dir, "configs")
         scheduler = DDIMScheduler.from_pretrained(configs_dir)
         try:
             if not os.path.exists(unet_config_path):

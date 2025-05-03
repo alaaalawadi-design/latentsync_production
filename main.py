@@ -1,8 +1,5 @@
-import sys 
-sys.path.append('./interpolation')
-import os 
-from pathlib import Path
 
+from pathlib import Path
 from blocks.lipsync_block import LibSyncBlock
 from blocks.preprocessing_block import PreProcessingBlock
 from blocks.postprocessing_block import PostProcessingBlock
@@ -22,7 +19,8 @@ class App:
         self.ref_video_manager = ref_video_manager
 
         self.preprocessing_block = PreProcessingBlock() 
-        self.lipsync_block = LibSyncBlock(self.project_manager.unet_config_path,
+        self.lipsync_block = LibSyncBlock(self.project_manager.base_dir,
+                                          self.project_manager.unet_config_path,
                                           self.project_manager.inference_ckpt_path,
                                           self.project_manager.whisper_small_model_path,
                                           self.project_manager.whisper_tiny_model_path,
