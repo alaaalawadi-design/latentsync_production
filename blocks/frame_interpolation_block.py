@@ -1,8 +1,7 @@
 import cv2
 import torch
-import ffmpeg
 from torch.nn import functional as F
-from train_log.RIFE_HDv3 import Model
+from interpolation.train_log.RIFE_HDv3 import Model
 import warnings
 warnings.filterwarnings("ignore")
 
