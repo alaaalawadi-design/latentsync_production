@@ -22,7 +22,8 @@ class LibSyncBlock:
                 seed=None
                 ):
     
-        scheduler = DDIMScheduler.from_pretrained("configs")
+        configs_dir = os.path.abspath(os.path.join(os.getcwd(), "configs"))
+        scheduler = DDIMScheduler.from_pretrained(configs_dir)
         try:
             if not os.path.exists(unet_config_path):
                 raise FileNotFoundError(f"Config file not found: {unet_config_path}")
