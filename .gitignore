@@ -6,3 +6,4 @@ data/intermediate_videos/**
 data/results/**
 data/tmp/**
 file.txt
+data/ref_videos/ref_frames_data.pkl
