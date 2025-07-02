@@ -2,7 +2,7 @@ from pathlib import Path
 import os 
 
 class ProjectManager:
-    def __init__(self, base_dir: Path, models_dir: Path, device="cuda", seed=42, guidance_scale=0.2):
+    def __init__(self, base_dir: Path, models_dir: Path, device="cuda", seed=42, guidance_scale=1.5):
         self.base_dir = base_dir.resolve()
         self.models_dir = models_dir.resolve()
         self.device = device
@@ -23,10 +23,9 @@ class ProjectManager:
         self.inference_ckpt_path = self.models_dir / 'latentsync_unet.pt'
         self.whisper_small_model_path = self.models_dir / "whisper" / "small.pt"
         self.whisper_tiny_model_path = self.models_dir / "whisper" / "tiny.pt"
-        self.ref_video_path = self.data_dir / "ref_videos" / "ref_video.mp4"
+        self.ref_video_path = self.data_dir / "ref_videos" / "new_ref_1920.mp4"
         self.saved_ref_video_data_path = self.data_dir / "ref_videos" / "ref_frames_data.pkl"
         self.silent_video_path = self.data_dir / "ref_videos" / "silent.mp4"
-
 
 
     def _ensure_dirs(self):

@@ -5,6 +5,7 @@ from typing import List, Optional, Tuple, Union, TYPE_CHECKING
 
 import numpy as np
 import torch
+import torch.nn.functional as F
 import tqdm
 
 from .audio import SAMPLE_RATE, N_FRAMES, HOP_LENGTH, pad_or_trim, log_mel_spectrogram
@@ -83,7 +84,10 @@ def transcribe(
         decode_options["fp16"] = False
 
     mel = log_mel_spectrogram(audio)
-   
+    pad_frames = 64
+    if pad_frames > 0:
+        mel = F.pad(mel, (0, pad_frames)) 
+
     all_segments = []
     def add_segment(
             *, start: float, end: float, encoder_embeddings
@@ -96,36 +100,161 @@ def transcribe(
                 "encoder_embeddings":encoder_embeddings,
             }
         )
-    # show the progress bar when verbose is False (otherwise the transcribed text will be printed)
     num_frames = mel.shape[-1]
     seek = 0
-    previous_seek_value = seek
-    sample_skip = 3000 # 
+    overlap = 500    
+    step = N_FRAMES - overlap 
+
     with tqdm.tqdm(total=num_frames, unit='frames', disable=verbose is not False) as pbar:
         while seek < num_frames:
-            # seek是开始的帧数
-            end_seek = min(seek + sample_skip, num_frames)
-            segment = pad_or_trim(mel[:,seek:seek+sample_skip], N_FRAMES).to(model.device).to(dtype)
+            end_seek = min(seek + N_FRAMES, num_frames)
+            segment = pad_or_trim(mel[:,seek:end_seek], N_FRAMES).to(model.device).to(dtype)
             
             single = segment.ndim == 2
             if single:
                 segment = segment.unsqueeze(0)
             if dtype == torch.float16:
                 segment = segment.half()
-            audio_features, embeddings  = model.encoder(segment, include_embeddings = True)
+            _, embeddings  = model.encoder(segment, include_embeddings = True)
+
+            if seek == 0:
+                save_start = 0
+                save_end = (step + overlap // 2)  
+                current_embeddings = embeddings[:, :, :save_end//2, :]
+            elif end_seek == num_frames:
+
+                save_start = (seek + overlap // 2)  
+                save_end = end_seek 
+                current_embeddings = embeddings[:,:, overlap//4:, :]
+            else:
+                save_start = (seek + overlap // 2) 
+                save_end = (seek + step + overlap // 2)  
+                current_embeddings = embeddings[:, :,overlap//4:-overlap//4, :]
             
-            encoder_embeddings = embeddings
-            #print(f"encoder_embeddings shape {encoder_embeddings.shape}")
             add_segment(
-                start=seek,
-                end=end_seek,
-                #text_tokens=tokens,
-                #result=result,
-                encoder_embeddings=encoder_embeddings,
+                start=save_start,
+                end=save_end,
+                encoder_embeddings=current_embeddings,
             )
-            seek+=sample_skip
+
+            seek += step
+            pbar.update(step)
     
     return dict(segments=all_segments)
+
+
+# def transcribe(
+#         model: "Whisper",
+#         audio: Union[str, np.ndarray, torch.Tensor],
+#         *,
+#         verbose: Optional[bool] = None,
+#         temperature: Union[float, Tuple[float, ...]] = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0),
+#         compression_ratio_threshold: Optional[float] = 2.4,
+#         logprob_threshold: Optional[float] = -1.0,
+#         no_speech_threshold: Optional[float] = 0.6,
+#         condition_on_previous_text: bool = True,
+#         force_extraction: bool = False,
+#         **decode_options,
+# ):
+#     """
+#     Transcribe an audio file using Whisper
+
+#     Parameters
+#     ----------
+#     model: Whisper
+#         The Whisper model instance
+
+#     audio: Union[str, np.ndarray, torch.Tensor]
+#         The path to the audio file to open, or the audio waveform
+
+#     verbose: bool
+#         Whether to display the text being decoded to the console. If True, displays all the details,
+#         If False, displays minimal details. If None, does not display anything
+
+#     temperature: Union[float, Tuple[float, ...]]
+#         Temperature for sampling. It can be a tuple of temperatures, which will be successfully used
+#         upon failures according to either `compression_ratio_threshold` or `logprob_threshold`.
+
+#     compression_ratio_threshold: float
+#         If the gzip compression ratio is above this value, treat as failed
+
+#     logprob_threshold: float
+#         If the average log probability over sampled tokens is below this value, treat as failed
+
+#     no_speech_threshold: float
+#         If the no_speech probability is higher than this value AND the average log probability
+#         over sampled tokens is below `logprob_threshold`, consider the segment as silent
+
+#     condition_on_previous_text: bool
+#         if True, the previous output of the model is provided as a prompt for the next window;
+#         disabling may make the text inconsistent across windows, but the model becomes less prone to
+#         getting stuck in a failure loop, such as repetition looping or timestamps going out of sync.
+
+#     decode_options: dict
+#         Keyword arguments to construct `DecodingOptions` instances
+
+#     Returns
+#     -------
+#     A dictionary containing the resulting text ("text") and segment-level details ("segments"), and
+#     the spoken language ("language"), which is detected when `decode_options["language"]` is None.
+#     """
+#     dtype = torch.float16 if decode_options.get("fp16", True) else torch.float32
+#     if model.device == torch.device("cpu"):
+#         if torch.cuda.is_available():
+#             warnings.warn("Performing inference on CPU when CUDA is available")
+#         if dtype == torch.float16:
+#             warnings.warn("FP16 is not supported on CPU; using FP32 instead")
+#             dtype = torch.float32
+
+#     if dtype == torch.float32:
+#         decode_options["fp16"] = False
+
+#     mel = log_mel_spectrogram(audio)
+   
+#     all_segments = []
+#     def add_segment(
+#             *, start: float, end: float, encoder_embeddings
+#     ):
+      
+#         all_segments.append(
+#             {
+#                 "start": start,
+#                 "end": end,
+#                 "encoder_embeddings":encoder_embeddings,
+#             }
+#         )
+#     # show the progress bar when verbose is False (otherwise the transcribed text will be printed)
+#     num_frames = mel.shape[-1]
+#     seek = 0
+#     previous_seek_value = seek
+#     sample_skip = 3000 # 
+#     with tqdm.tqdm(total=num_frames, unit='frames', disable=verbose is not False) as pbar:
+#         while seek < num_frames:
+#             # seek是开始的帧数
+#             end_seek = min(seek + sample_skip, num_frames)
+#             segment = pad_or_trim(mel[:,seek:seek+sample_skip], N_FRAMES).to(model.device).to(dtype)
+            
+#             single = segment.ndim == 2
+#             if single:
+#                 segment = segment.unsqueeze(0)
+#             if dtype == torch.float16:
+#                 segment = segment.half()
+#             audio_features, embeddings  = model.encoder(segment, include_embeddings = True)
+            
+#             encoder_embeddings = embeddings
+#             #print(f"encoder_embeddings shape {encoder_embeddings.shape}")
+
+#             add_segment(
+#                 start=seek,
+#                 end=end_seek,
+#                 #text_tokens=tokens,
+#                 #result=result,
+#                 encoder_embeddings=encoder_embeddings,
+#             )
+#             print(seek, end_seek, encoder_embeddings.shape)
+#             seek+=sample_skip
+    
+#     return dict(segments=all_segments)
 
 
 def cli():
@@ -205,3 +334,34 @@ def cli():
 
 if __name__ == '__main__':
     cli()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

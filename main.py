@@ -75,16 +75,17 @@ class App:
 if __name__ == "__main__":
     
     base_dir=Path('.')
-    models_dir = Path('/media/ehab/46EEC3E77E2602C6/Cyshield/LatentSync/checkpoints')    
+    models_dir = Path('../../LatentSync/checkpoints/')    
     project_manager = ProjectManager(base_dir, models_dir)
     lipsync_app = App(project_manager)
     
     
     import time 
     s_time = time.time()
-    audio_path = "/home/ehab/Downloads/audio2.wav"
-    save_path = "/home/ehab/Downloads/results/test1"
-    backgrounds = ['morning', 'night', 'noon', 'sunset']
+    audio_path = "../test_data/audios/Perfect_2_5.wav"
+    save_path = "../test_data/results/test1/"
+    # backgrounds = ['morning', 'night', 'noon', 'sunset']
+    backgrounds = ['morning']
     project_manager.set_audio_path(audio_path)
     project_manager.set_save_path(save_path)
     project_manager.set_background_paths(backgrounds)
@@ -94,14 +95,14 @@ if __name__ == "__main__":
     
 
 
-    import time 
-    s_time = time.time()
-    audio_path = "/home/ehab/Downloads/out_7.wav"
-    save_path = "/home/ehab/Downloads/results/test1"
-    backgrounds = ['morning', 'night', 'noon', 'sunset']
-    project_manager.set_audio_path(audio_path)
-    project_manager.set_save_path(save_path)
-    project_manager.set_background_paths(backgrounds)
-    lipsync_app.run()    
-    e_time = time.time()
-    print(e_time-s_time)
+    # import time 
+    # s_time = time.time()
+    # audio_path = "/home/ehab/Downloads/out_7.wav"
+    # save_path = "/home/ehab/Downloads/results/test1"
+    # backgrounds = ['morning', 'night', 'noon', 'sunset']
+    # project_manager.set_audio_path(audio_path)
+    # project_manager.set_save_path(save_path)
+    # project_manager.set_background_paths(backgrounds)
+    # lipsync_app.run()    
+    # e_time = time.time()
+    # print(e_time-s_time)
