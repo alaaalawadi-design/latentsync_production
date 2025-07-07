@@ -368,7 +368,7 @@ class LipsyncPipeline(DiffusionPipeline):
             generator,
         )
         self.set_ref_video_data(start=self.frame_pointer, end=total_frames+self.frame_pointer)
-        self.set_pointer(self.frame_pointer+total_frames)
+        self.set_pointer(self.frame_pointer+total_frames-5)
         
         for i in tqdm.tqdm(range(num_inferences), desc="Doing inference..."):
             start_idx = i * num_frames

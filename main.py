@@ -94,15 +94,17 @@ if __name__ == "__main__":
     print(e_time-s_time)
     
 
-
-    # import time 
-    # s_time = time.time()
-    # audio_path = "/home/ehab/Downloads/out_7.wav"
-    # save_path = "/home/ehab/Downloads/results/test1"
+    import time 
+    s_time = time.time()
+    audio_path = "../test_data/audios/perfect_3_4.wav"
+    save_path = "../test_data/results/test2/"
     # backgrounds = ['morning', 'night', 'noon', 'sunset']
-    # project_manager.set_audio_path(audio_path)
-    # project_manager.set_save_path(save_path)
-    # project_manager.set_background_paths(backgrounds)
-    # lipsync_app.run()    
-    # e_time = time.time()
-    # print(e_time-s_time)
+    backgrounds = ['morning']
+    project_manager.set_audio_path(audio_path)
+    project_manager.set_save_path(save_path)
+    project_manager.set_background_paths(backgrounds)
+    lipsync_app.run()    
+    e_time = time.time()
+    print(e_time-s_time)
+
+
