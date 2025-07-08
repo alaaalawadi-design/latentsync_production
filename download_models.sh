@@ -18,10 +18,12 @@ fi
 # Download the models into checkpoints directory
 cd checkpoints
 
-wget -c https://huggingface.co/ByteDance/LatentSync/resolve/main/config.json
-wget -c https://huggingface.co/ByteDance/LatentSync/resolve/main/latentsync_syncnet.pt
-wget -c https://huggingface.co/ByteDance/LatentSync/resolve/main/latentsync_unet.pt
+# wget -c https://huggingface.co/ByteDance/LatentSync/resolve/main/latentsync_unet.pt
 
+# download new trained checkpoint
+gdown 1xeDX-JlFdE78kohRC3NDTuXmcV8180MK
+
+# download flowne model
 gdown 1ypPNVRe4N9ne3K6Ba6GMQms__WhpfeEW 
 
 # Create whisper subdirectory and download whisper model
