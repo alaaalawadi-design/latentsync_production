@@ -2,7 +2,7 @@ from pathlib import Path
 import os 
 
 class ProjectManager:
-    def __init__(self, base_dir: Path, models_dir: Path, device="cuda", seed=1247, guidance_scale=1.5):
+    def __init__(self, base_dir: Path, models_dir: Path, device="cuda", seed=1247, guidance_scale=2):
         self.base_dir = base_dir.resolve()
         self.models_dir = models_dir.resolve()
         self.device = device

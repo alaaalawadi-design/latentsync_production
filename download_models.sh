@@ -21,7 +21,7 @@ cd checkpoints
 # wget -c https://huggingface.co/ByteDance/LatentSync/resolve/main/latentsync_unet.pt
 
 # download new trained checkpoint
-gdown 1xeDX-JlFdE78kohRC3NDTuXmcV8180MK
+gdown 13P5qQUy9v5DqBCatgg-9YeM1XPc0qayF
 
 # download flowne model
 gdown 1ypPNVRe4N9ne3K6Ba6GMQms__WhpfeEW 
