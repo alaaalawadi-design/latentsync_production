@@ -105,6 +105,7 @@ def transcribe(
     overlap = 500    
     step = N_FRAMES - overlap 
 
+        
     with tqdm.tqdm(total=num_frames, unit='frames', disable=verbose is not False) as pbar:
         while seek < num_frames:
             end_seek = min(seek + N_FRAMES, num_frames)
@@ -117,7 +118,11 @@ def transcribe(
                 segment = segment.half()
             _, embeddings  = model.encoder(segment, include_embeddings = True)
 
-            if seek == 0:
+            if seek == 0 and end_seek == num_frames:
+                save_start = 0
+                save_end = end_seek
+                current_embeddings = embeddings
+            elif seek == 0:
                 save_start = 0
                 save_end = (step + overlap // 2)  
                 current_embeddings = embeddings[:, :, :save_end//2, :]
@@ -136,10 +141,10 @@ def transcribe(
                 end=save_end,
                 encoder_embeddings=current_embeddings,
             )
-
+            # print(save_start, save_end, current_embeddings.shape)
             seek += step
             pbar.update(step)
-    
+        
     return dict(segments=all_segments)
 
 
