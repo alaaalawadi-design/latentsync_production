@@ -94,6 +94,10 @@ def read_video_cv2(video_path: str):
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frames.append(frame_rgb)
 
+        # if len(frames)==1000 :
+        #     break
+
+
     # Release the video capture object
     cap.release()
 

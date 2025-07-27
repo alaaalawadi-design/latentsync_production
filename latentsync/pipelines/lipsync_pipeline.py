@@ -1,24 +1,28 @@
+
 # Adapted from https://github.com/guoyww/AnimateDiff/blob/main/animatediff/pipelines/pipeline_animation.py
 
 import inspect
 import os
-import shutil
 from typing import Callable, List, Optional, Union
 import subprocess
 import pickle
 from pydub import AudioSegment
-
-
+from torchvision import transforms
 import numpy as np
 import torch
 import torchvision
 import math
 from diffusers.utils import is_accelerate_available
 from packaging import version
-
 from diffusers.configuration_utils import FrozenDict
 from diffusers.models import AutoencoderKL
 from diffusers.pipeline_utils import DiffusionPipeline
+import numpy as np
+import torch
+from einops import rearrange
+
+
+
 from diffusers.schedulers import (
     DDIMScheduler,
     DPMSolverMultistepScheduler,
@@ -27,20 +31,23 @@ from diffusers.schedulers import (
     LMSDiscreteScheduler,
     PNDMScheduler,
 )
+
+
+from latentsync.utils.image_processor import  ImageProcessor  , load_fixed_mask
+
 from diffusers.utils import deprecate, logging
-
 from einops import rearrange
-import cv2
-
-from ..models.unet import UNet3DConditionModel
-from ..utils.image_processor import ImageProcessor
+from ..models.unet import UNet3DConditionModel 
 from ..utils.util import read_video, read_audio, write_video, check_ffmpeg_installed
 from ..whisper.audio2feature import Audio2Feature
 import tqdm
-import soundfile as sf
 
-logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
+
+logger = logging.get_logger(__name__)  
+
+
+# pylint: disable=invalid-name
 
 class LipsyncPipeline(DiffusionPipeline):
     _optional_components = []
@@ -59,6 +66,10 @@ class LipsyncPipeline(DiffusionPipeline):
             DPMSolverMultistepScheduler,
         ],
     ):
+
+
+
+        
         super().__init__()
 
         if hasattr(scheduler.config, "steps_offset") and scheduler.config.steps_offset != 1:
@@ -70,6 +81,8 @@ class LipsyncPipeline(DiffusionPipeline):
                 " it would be very nice if you could open a Pull request for the `scheduler/scheduler_config.json`"
                 " file"
             )
+
+
             deprecate("steps_offset!=1", "1.0.0", deprecation_message, standard_warn=False)
             new_config = dict(scheduler.config)
             new_config["steps_offset"] = 1
@@ -83,6 +96,7 @@ class LipsyncPipeline(DiffusionPipeline):
                 " future versions. If you have downloaded this checkpoint from the Hugging Face Hub, it would be very"
                 " nice if you could open a Pull request for the `scheduler/scheduler_config.json` file"
             )
+
             deprecate("clip_sample not set", "1.0.0", deprecation_message, standard_warn=False)
             new_config = dict(scheduler.config)
             new_config["clip_sample"] = False
@@ -109,6 +123,9 @@ class LipsyncPipeline(DiffusionPipeline):
             new_config["sample_size"] = 64
             unet._internal_dict = FrozenDict(new_config)
 
+
+
+
         self.register_modules(
             vae=vae,
             audio_encoder=audio_encoder,
@@ -117,7 +134,11 @@ class LipsyncPipeline(DiffusionPipeline):
         )
 
         self.vae_scale_factor = 2 ** (len(self.vae.config.block_out_channels) - 1)
-        self.image_processor = ImageProcessor(256, mask='fix_mask', device="cuda")
+
+        default_mask_image_path = "latentsync/utils/mask.png"
+        default_mask_image = load_fixed_mask(256, default_mask_image_path)
+        self.image_processor = ImageProcessor(256, device="cuda", mask_image=default_mask_image)
+        
         self.set_progress_bar_config(desc="Steps")
         # self.set_pointer(0)
         self.frame_pointer = 0
@@ -128,6 +149,7 @@ class LipsyncPipeline(DiffusionPipeline):
 
     def disable_vae_slicing(self):
         self.vae.disable_slicing()
+
 
     def enable_sequential_cpu_offload(self, gpu_id=0):
         if is_accelerate_available():
@@ -154,11 +176,14 @@ class LipsyncPipeline(DiffusionPipeline):
                 return torch.device(module._hf_hook.execution_device)
         return self.device
 
+
+
     def decode_latents(self, latents):
         latents = latents / self.vae.config.scaling_factor + self.vae.config.shift_factor
         latents = rearrange(latents, "b c f h w -> (b f) c h w")
         decoded_latents = self.vae.decode(latents).sample
         return decoded_latents
+
 
     def prepare_extra_step_kwargs(self, generator, eta):
         # prepare extra kwargs for the scheduler step, since not all schedulers have the same signature
@@ -166,17 +191,23 @@ class LipsyncPipeline(DiffusionPipeline):
         # eta corresponds to η in DDIM paper: https://arxiv.org/abs/2010.02502
         # and should be between [0, 1]
 
+
+
         accepts_eta = "eta" in set(inspect.signature(self.scheduler.step).parameters.keys())
         extra_step_kwargs = {}
         if accepts_eta:
             extra_step_kwargs["eta"] = eta
 
         # check if the scheduler accepts generator
+
         accepts_generator = "generator" in set(inspect.signature(self.scheduler.step).parameters.keys())
+     
         if accepts_generator:
             extra_step_kwargs["generator"] = generator
         return extra_step_kwargs
 
+    
+    
     def check_inputs(self, height, width, callback_steps):
         assert height == width, "Height and width must be equal"
 
@@ -190,6 +221,8 @@ class LipsyncPipeline(DiffusionPipeline):
                 f"`callback_steps` has to be a positive integer but is {callback_steps} of type"
                 f" {type(callback_steps)}."
             )
+
+
 
     def prepare_latents(self, batch_size, num_frames, num_channels_latents, height, width, dtype, device, generator):
         shape = (
@@ -207,6 +240,8 @@ class LipsyncPipeline(DiffusionPipeline):
         latents = latents * self.scheduler.init_noise_sigma
         return latents
 
+    
+    
     def prepare_mask_latents(
         self, mask, masked_image, height, width, dtype, device, generator, do_classifier_free_guidance
     ):
@@ -235,6 +270,9 @@ class LipsyncPipeline(DiffusionPipeline):
             torch.cat([masked_image_latents] * 2) if do_classifier_free_guidance else masked_image_latents
         )
         return mask, masked_image_latents
+    
+
+
 
     def prepare_image_latents(self, images, device, dtype, generator, do_classifier_free_guidance):
         images = images.to(device=device, dtype=dtype)
@@ -244,11 +282,14 @@ class LipsyncPipeline(DiffusionPipeline):
         image_latents = torch.cat([image_latents] * 2) if do_classifier_free_guidance else image_latents
 
         return image_latents
+    
+
 
     def set_progress_bar_config(self, **kwargs):
         if not hasattr(self, "_progress_bar_config"):
             self._progress_bar_config = {}
         self._progress_bar_config.update(kwargs)
+
 
     @staticmethod
     def paste_surrounding_pixels_back(decoded_latents, pixel_values, masks, device, weight_dtype):
@@ -266,13 +307,19 @@ class LipsyncPipeline(DiffusionPipeline):
         images = images.cpu().numpy()
         return images
 
+    
     def affine_transform_video(self, video_path):
         video_frames = read_video(video_path, use_decord=False)
+        
         faces = []
         boxes = []
         affine_matrices = []
-        print(f"Affine transforming {len(video_frames)} faces...")
+        
         for frame in tqdm.tqdm(video_frames):
+            # Ensure we're using the correctly initialized image_processor
+            if self.image_processor is None:
+                raise RuntimeError("ImageProcessor not initialized. Call __call__() method first.")
+                
             face, box, affine_matrix = self.image_processor.affine_transform(frame)
             faces.append(face)
             boxes.append(box)
@@ -280,23 +327,34 @@ class LipsyncPipeline(DiffusionPipeline):
 
         faces = torch.stack(faces)
         return faces, video_frames, boxes, affine_matrices
+            
 
-    def restore_video(self, faces, video_frames, boxes, affine_matrices):
-        video_frames = video_frames[: faces.shape[0]]
+
+
+    def restore_video(self, faces: torch.Tensor, video_frames: np.ndarray, boxes: list, affine_matrices: list):
+        video_frames = video_frames[: len(faces)]
         out_frames = []
         print(f"Restoring {len(faces)} faces...")
+
         for index, face in enumerate(tqdm.tqdm(faces)):
             x1, y1, x2, y2 = boxes[index]
             height = int(y2 - y1)
             width = int(x2 - x1)
-            face = torchvision.transforms.functional.resize(face, size=(height, width), antialias=True)
-            face = rearrange(face, "c h w -> h w c")
-            face = (face / 2 + 0.5).clamp(0, 1)
-            face = (face * 255).to(torch.uint8).cpu().numpy()
-            # face = cv2.resize(face, (width, height), interpolation=cv2.INTER_LANCZOS4)
+            
+            
+            # Resize face to match aligned face dimensions (from affine transform)
+            face = torchvision.transforms.functional.resize(
+                face, size=(height, width), interpolation=transforms.InterpolationMode.BICUBIC, antialias=True
+            )
+            
+            # Don't normalize - let AlignRestore handle it
+            face = face.to(dtype=self.image_processor.restorer.dtype, device=self.image_processor.restorer.device)
+            
             out_frame = self.image_processor.restorer.restore_img(video_frames[index], face, affine_matrices[index])
             out_frames.append(out_frame)
+        
         return np.stack(out_frames, axis=0)
+    
 
     @torch.no_grad()
     def __call__(
@@ -314,37 +372,52 @@ class LipsyncPipeline(DiffusionPipeline):
         guidance_scale: float = 1.5,
         weight_dtype: Optional[torch.dtype] = torch.float16,
         eta: float = 0.0,
-        mask: str = "fix_mask",
+        # added 
+        mask_image_path: str = "latentsync/utils/mask.png",
+        # mask: str = "fix_mask",
         generator: Optional[Union[torch.Generator, List[torch.Generator]]] = None,
         callback: Optional[Callable[[int, int, torch.FloatTensor], None]] = None,
         callback_steps: Optional[int] = 1,
-        **kwargs,
+        # **kwargs,
     ):
 
         self.unet.eval()
         check_ffmpeg_installed()
+        # 0. Define call parameters
+
 
         batch_size = 1
         device = self._execution_device
-        self.set_progress_bar_config(desc=f"Sample frames: {num_frames}")
-        
-        self.add_silent_to_audio(audio_path, audio_sample_rate, tmp_audio_path)
-        audio_samples = read_audio(str(tmp_audio_path), audio_sample_rate)
-    
+
         height = height or self.unet.config.sample_size * self.vae_scale_factor
         width = width or self.unet.config.sample_size * self.vae_scale_factor
 
+        
+        
+        # This ensures AlignRestore uses the same resolution as the model
+        mask_image = load_fixed_mask(height, mask_image_path)
+        self.image_processor = ImageProcessor(height, device="cuda", mask_image=mask_image)
+        
+
+        self.set_progress_bar_config(desc=f"Sample frames: {num_frames}")        
+        self.add_silent_to_audio(audio_path, audio_sample_rate, tmp_audio_path)
+        audio_samples = read_audio(str(tmp_audio_path), audio_sample_rate)
+
+        # 2. Check inputs
 
         self.check_inputs(height, width, callback_steps)
 
         do_classifier_free_guidance = guidance_scale > 1.0
+        # 3. set timesteps
 
         self.scheduler.set_timesteps(num_inference_steps, device=device)
         timesteps = self.scheduler.timesteps
 
-        extra_step_kwargs = self.prepare_extra_step_kwargs(generator, eta)
+        # 4. Prepare extra step kwargs.
 
+        extra_step_kwargs = self.prepare_extra_step_kwargs(generator, eta)
         self.video_fps = video_fps
+
 
         if self.unet.add_audio_layer:
             whisper_feature = self.audio_encoder.audio2feat(audio_samples)
@@ -367,19 +440,25 @@ class LipsyncPipeline(DiffusionPipeline):
             device,
             generator,
         )
+
         self.set_ref_video_data(start=self.frame_pointer, end=total_frames+self.frame_pointer)
+        
         self.set_pointer(self.frame_pointer+total_frames-5)
         
         for i in tqdm.tqdm(range(num_inferences), desc="Doing inference..."):
+
             start_idx = i * num_frames
             end_idx = min(start_idx + num_frames, total_frames)  
+            
             
             if self.unet.add_audio_layer:
                 audio_embeds = torch.stack(whisper_chunks[start_idx:end_idx])
                 audio_embeds = audio_embeds.to(device, dtype=weight_dtype)
+            
                 if do_classifier_free_guidance:
                     null_audio_embeds = torch.zeros_like(audio_embeds)
                     audio_embeds = torch.cat([null_audio_embeds, audio_embeds])
+            
             else:
                 audio_embeds = None
 
@@ -406,7 +485,9 @@ class LipsyncPipeline(DiffusionPipeline):
                 generator,
                 do_classifier_free_guidance,
             )
+            
             num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
+            
             with self.progress_bar(total=num_inference_steps) as progress_bar:
                 for j, t in enumerate(timesteps):
                     latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
@@ -428,14 +509,19 @@ class LipsyncPipeline(DiffusionPipeline):
                 decoded_latents, pixel_values, 1 - masks, device, weight_dtype
             )
             synced_video_frames.append(decoded_latents)
+
+        
         synced_video_frames = self.restore_video(
             torch.cat(synced_video_frames), self.original_video_frames, self.boxes, self.affine_matrices
         )
+
+        
         temp_dir = os.path.dirname(tmp_audio_path)
         write_video(os.path.join(temp_dir, "video.mp4"), synced_video_frames[5:], fps=25)
         command = f"ffmpeg -y -loglevel error -nostdin -i {os.path.join(temp_dir, 'video.mp4')} -i {tmp_audio_path} -c:v libx264 -c:a aac -q:v 0 -q:a 0 {video_out_path}"
         subprocess.run(command, shell=True)
         return synced_video_frames[5, :, :, :], synced_video_frames[-1, :, :, :]
+
 
 
     def prepare_ref_video(self, video_path, saved_video_data_path):
@@ -448,6 +534,9 @@ class LipsyncPipeline(DiffusionPipeline):
                 out_video_with_scielnt = pickle.load(f)
             self.all_faces, self.all_original_video_frames, self.all_boxes, self.all_affine_matrices = out_video_with_scielnt
 
+
+
+
     def add_silent_to_audio(self, audio_path, audio_sample_rate, tmp_audio_path):
         audio = AudioSegment.from_file(audio_path, format="wav")
         number_of_samples = 4480
@@ -456,10 +545,14 @@ class LipsyncPipeline(DiffusionPipeline):
         new_audio = silent_segment + audio
         new_audio.export(tmp_audio_path, format="wav")
         
+    
     def set_pointer(self, start_number):
         total_frames = len(self.all_faces)
         self.frame_pointer = start_number % total_frames
 
+
+
+    
     def set_ref_video_data(self, start=0, end=None):
         total_frames = len(self.all_faces)
 
@@ -471,19 +564,25 @@ class LipsyncPipeline(DiffusionPipeline):
         if required_frames <= total_frames:
             end = end % total_frames  
             if start < end:
+                # Simple case: no wraparound needed
                 self.faces = self.all_faces[start:end]
                 self.original_video_frames = self.all_original_video_frames[start:end]
                 self.boxes = self.all_boxes[start:end]
                 self.affine_matrices = self.all_affine_matrices[start:end]
             else:
+                # Wraparound case
                 self.faces = torch.cat((self.all_faces[start:], self.all_faces[:end]), dim=0)
                 self.original_video_frames = np.concatenate((self.all_original_video_frames[start:], self.all_original_video_frames[:end]), axis=0)
                 self.boxes = np.concatenate((self.all_boxes[start:], self.all_boxes[:end]), axis=0)
-                self.affine_matrices = np.concatenate((self.all_affine_matrices[start:], self.all_affine_matrices[:end]), axis=0)
+                self.affine_matrices = self.all_affine_matrices[start:] + self.all_affine_matrices[:end]
         else:
+            # Need more frames than available - loop the video
             full_cycles = required_frames // total_frames
             remaining_frames = required_frames % total_frames
+            
             self.faces = torch.cat([self.all_faces] * full_cycles + [self.all_faces[:remaining_frames]], dim=0)
             self.original_video_frames = np.concatenate([self.all_original_video_frames] * full_cycles + [self.all_original_video_frames[:remaining_frames]], axis=0)
             self.boxes = np.concatenate([self.all_boxes] * full_cycles + [self.all_boxes[:remaining_frames]], axis=0)
-            self.affine_matrices = np.concatenate([self.all_affine_matrices] * full_cycles + [self.all_affine_matrices[:remaining_frames]], axis=0)
+            self.affine_matrices = self.all_affine_matrices * full_cycles + self.all_affine_matrices[:remaining_frames]
+
+

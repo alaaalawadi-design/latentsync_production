@@ -25,6 +25,7 @@ class LibSyncBlock:
     
         configs_dir = os.path.join(base_dir, "configs")
         scheduler = DDIMScheduler.from_pretrained(configs_dir)
+        
         try:
             if not os.path.exists(unet_config_path):
                 raise FileNotFoundError(f"Config file not found: {unet_config_path}")
@@ -64,7 +65,7 @@ class LibSyncBlock:
             torch.seed()
 
         self.pipeline.prepare_ref_video(ref_video_path, saved_ref_video_data_path)
-            
+
     def execute(self, 
             audio_path, 
             video_out_path, 
@@ -81,6 +82,9 @@ class LibSyncBlock:
             weight_dtype=torch.float16,
             width=self.config.data.resolution,
             height=self.config.data.resolution,
+                # # Add default initialization - you'll need to set proper values
+
+
         )
         self.set_first_gen_frame(first_frame)
         self.set_last_gen_frame(last_frame)

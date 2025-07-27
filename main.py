@@ -72,42 +72,44 @@ class App:
         self.cleanup()
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
     
-#     base_dir=Path('.')
-#     models_dir = Path('../checkpoints/')    
-#     project_manager = ProjectManager(base_dir, models_dir)
-#     lipsync_app = App(project_manager)
+    base_dir=Path('.')
+    # models_dir = Path('../checkpoints/')  
+    models_dir = Path("/media/administrator/disk_2/GenAI2/LatentSync/checkpoints")
+    project_manager = ProjectManager(base_dir, models_dir)
+    lipsync_app = App(project_manager)
     
     
-#     import time 
-#     s_time = time.time()
-#     audio_path = "../test_data/audios/Perfect_2_5.wav"
-#     save_path = "../test_data/results/test1/"
-#     backgrounds = ['morning', 'night', 'noon', 'sunset']
-#     # backgrounds = ['morning']
-#     project_manager.set_audio_path(audio_path)
-#     project_manager.set_save_path(save_path)
-#     project_manager.set_background_paths(backgrounds)
-#     lipsync_app.run()    
-#     e_time = time.time()
-#     print(e_time-s_time)
+    # import time 
+    # s_time = time.time()
+    # audio_path = "../test_data/audios/Perfect_2_5.wav"
+    # save_path = "../test_data/results/test1/"
+    # backgrounds = ['morning', 'night', 'noon', 'sunset']
+    # # backgrounds = ['morning']
+    # project_manager.set_audio_path(audio_path)
+    # project_manager.set_save_path(save_path)
+    # project_manager.set_background_paths(backgrounds)
+    # lipsync_app.run()    
+    # e_time = time.time()
+    # print(e_time-s_time)
     
+    import time 
+    s_time = time.time()
+    audio_path = "../test_data/audios/perfect1_2.wav"
+    save_path = "../test_data/results/test/"
+    # backgrounds = ['morning', 'night', 'noon', 'sunset']
+    backgrounds = ['morning']
+    project_manager.set_audio_path(audio_path)
+    project_manager.set_save_path(save_path)
+    project_manager.set_background_paths(backgrounds)
+    lipsync_app.run()    
+    e_time = time.time()
+    print(e_time-s_time)
 
-#     import time 
-#     s_time = time.time()
-#     audio_path = "../test_data/audios/perfect1_2.wav"
-#     save_path = "../test_data/results/test2/"
-#     backgrounds = ['morning', 'night', 'noon', 'sunset']
-#     # backgrounds = ['morning']
-#     project_manager.set_audio_path(audio_path)
-#     project_manager.set_save_path(save_path)
-#     project_manager.set_background_paths(backgrounds)
-#     lipsync_app.run()    
-#     e_time = time.time()
-#     print(e_time-s_time)
 
-#     import time 
+
+    # import time 
 #     s_time = time.time()
 #     audio_path = "../test_data/audios/perfect_3_4.wav"
 #     save_path = "../test_data/results/test3/"
