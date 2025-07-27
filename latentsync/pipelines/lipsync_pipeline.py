@@ -135,9 +135,7 @@ class LipsyncPipeline(DiffusionPipeline):
 
         self.vae_scale_factor = 2 ** (len(self.vae.config.block_out_channels) - 1)
 
-        default_mask_image_path = "latentsync/utils/mask.png"
-        default_mask_image = load_fixed_mask(256, default_mask_image_path)
-        self.image_processor = ImageProcessor(256, device="cuda", mask_image=default_mask_image)
+        self.image_processor = ImageProcessor(256, device="cuda")
         
         self.set_progress_bar_config(desc="Steps")
         # self.set_pointer(0)
@@ -392,12 +390,6 @@ class LipsyncPipeline(DiffusionPipeline):
         height = height or self.unet.config.sample_size * self.vae_scale_factor
         width = width or self.unet.config.sample_size * self.vae_scale_factor
 
-        
-        
-        # This ensures AlignRestore uses the same resolution as the model
-        mask_image = load_fixed_mask(height, mask_image_path)
-        self.image_processor = ImageProcessor(height, device="cuda", mask_image=mask_image)
-        
 
         self.set_progress_bar_config(desc=f"Sample frames: {num_frames}")        
         self.add_silent_to_audio(audio_path, audio_sample_rate, tmp_audio_path)

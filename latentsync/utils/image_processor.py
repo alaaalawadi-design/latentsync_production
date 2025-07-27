@@ -2,6 +2,8 @@
 from latentsync.utils.util import read_video, write_video
 from torchvision import transforms
 import cv2
+import os 
+
 from einops import rearrange
 import torch
 import numpy as np
@@ -9,9 +11,10 @@ from typing import Union
 from .affine_transform import AlignRestore
 from .face_detector import FaceDetector
 
-# latentsync/utils/
-def load_fixed_mask(resolution: int, mask_image_path="mask.png") -> torch.Tensor:
-    mask_image = cv2.imread(mask_image_path)
+def load_fixed_mask(resolution: int) -> torch.Tensor:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    mask_path = os.path.join(current_dir, "mask.png")
+    mask_image = cv2.imread(mask_path)
     mask_image = cv2.cvtColor(mask_image, cv2.COLOR_BGR2RGB)
     mask_image = cv2.resize(mask_image, (resolution, resolution), interpolation=cv2.INTER_LANCZOS4) / 255.0
     mask_image = rearrange(torch.from_numpy(mask_image), "h w c -> c h w")
