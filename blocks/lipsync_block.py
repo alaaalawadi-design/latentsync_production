@@ -8,6 +8,7 @@ from latentsync.pipelines.lipsync_pipeline import LipsyncPipeline
 from diffusers.utils.import_utils import is_xformers_available
 from accelerate.utils import set_seed
 from latentsync.whisper.audio2feature import Audio2Feature
+from latentsync.utils.image_processor import  ImageProcessor  , load_fixed_mask
 
 
 class LibSyncBlock:
@@ -17,6 +18,7 @@ class LibSyncBlock:
                 inference_ckpt_path,
                 whisper_small_model_path,
                 whisper_tiny_model_path,
+                detector_path,
                 ref_video_path,
                 saved_ref_video_data_path, 
                 device='cuda',
@@ -53,11 +55,19 @@ class LibSyncBlock:
         if is_xformers_available():
             unet.enable_xformers_memory_efficient_attention()
 
+        image_processor = ImageProcessor(
+            detector_path=detector_path,
+            resolution=256,
+            device="cuda"
+        )
+
+
         self.pipeline = LipsyncPipeline(
             vae=vae,
             audio_encoder=audio_encoder,
             unet=unet,
             scheduler=scheduler,
+            image_processor=image_processor
         ).to(device)
         if seed :
             set_seed(seed)

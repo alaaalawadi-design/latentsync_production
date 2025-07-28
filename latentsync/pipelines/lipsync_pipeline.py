@@ -33,7 +33,6 @@ from diffusers.schedulers import (
 )
 
 
-from latentsync.utils.image_processor import  ImageProcessor  , load_fixed_mask
 
 from diffusers.utils import deprecate, logging
 from einops import rearrange
@@ -65,6 +64,7 @@ class LipsyncPipeline(DiffusionPipeline):
             EulerAncestralDiscreteScheduler,
             DPMSolverMultistepScheduler,
         ],
+        image_processor
     ):
 
 
@@ -132,10 +132,8 @@ class LipsyncPipeline(DiffusionPipeline):
             unet=unet,
             scheduler=scheduler,
         )
-
+        self.image_processor = image_processor
         self.vae_scale_factor = 2 ** (len(self.vae.config.block_out_channels) - 1)
-
-        self.image_processor = ImageProcessor(256, device="cuda")
         
         self.set_progress_bar_config(desc="Steps")
         # self.set_pointer(0)
@@ -308,26 +306,17 @@ class LipsyncPipeline(DiffusionPipeline):
     
     def affine_transform_video(self, video_path):
         video_frames = read_video(video_path, use_decord=False)
-        
         faces = []
         boxes = []
-        affine_matrices = []
-        
+        affine_matrices = []    
         for frame in tqdm.tqdm(video_frames):
-            # Ensure we're using the correctly initialized image_processor
-            if self.image_processor is None:
-                raise RuntimeError("ImageProcessor not initialized. Call __call__() method first.")
-                
             face, box, affine_matrix = self.image_processor.affine_transform(frame)
             faces.append(face)
             boxes.append(box)
             affine_matrices.append(affine_matrix)
-
         faces = torch.stack(faces)
         return faces, video_frames, boxes, affine_matrices
             
-
-
 
     def restore_video(self, faces: torch.Tensor, video_frames: np.ndarray, boxes: list, affine_matrices: list):
         video_frames = video_frames[: len(faces)]
@@ -370,9 +359,6 @@ class LipsyncPipeline(DiffusionPipeline):
         guidance_scale: float = 1.5,
         weight_dtype: Optional[torch.dtype] = torch.float16,
         eta: float = 0.0,
-        # added 
-        mask_image_path: str = "latentsync/utils/mask.png",
-        # mask: str = "fix_mask",
         generator: Optional[Union[torch.Generator, List[torch.Generator]]] = None,
         callback: Optional[Callable[[int, int, torch.FloatTensor], None]] = None,
         callback_steps: Optional[int] = 1,

@@ -1,5 +1,5 @@
 
-from latentsync.utils.util import read_video, write_video
+from .util import read_video, write_video
 from torchvision import transforms
 import cv2
 import os 
@@ -22,7 +22,7 @@ def load_fixed_mask(resolution: int) -> torch.Tensor:
 
 
 class ImageProcessor:
-    def __init__(self, resolution: int = 512, device: str = "cpu", mask_image=None):
+    def __init__(self, detector_path: str, resolution: int = 512, device: str = "cpu", mask_image=None):
         
         self.resolution = resolution
         
@@ -40,7 +40,7 @@ class ImageProcessor:
         if device == "cpu":
             self.face_detector = None
         else:
-            self.face_detector = FaceDetector(device=device)
+            self.face_detector = FaceDetector(device=device, detector_path=detector_path)
 
 
 

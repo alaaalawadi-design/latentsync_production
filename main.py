@@ -20,6 +20,7 @@ class App:
                                           self.project_manager.inference_ckpt_path,
                                           self.project_manager.whisper_small_model_path,
                                           self.project_manager.whisper_tiny_model_path,
+                                          self.project_manager.detector_path,
                                           self.project_manager.ref_video_path, 
                                           self.project_manager.saved_ref_video_data_path,
                                           self.project_manager.device, 
