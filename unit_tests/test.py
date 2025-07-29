@@ -10,7 +10,7 @@ import main
 from projectmanager import ProjectManager
 
 base_dir = Path('/media/administrator/disk_2/GenAI2/latentsync_production/cysync')
-models_dir = Path('/media/administrator/disk_2/GenAI2/LatentSync/checkpoints')
+models_dir = Path('/media/administrator/disk_2/GenAI2/latentsync_production/checkpoints')
 project_manager = ProjectManager(base_dir, models_dir)
 
 lipsync_app = main.App(project_manager)
