@@ -514,7 +514,7 @@ class UNet3DConditionModel(ModelMixin, ConfigMixin):
         unet = cls.from_config(model_config).to(device)
         if ckpt_path != "":
             zero_rank_log(logger, f"Load from checkpoint: {ckpt_path}")
-            ckpt = torch.load(ckpt_path, map_location=device)
+            ckpt = torch.load(ckpt_path, map_location=device , weights_only = False)
             if "global_step" in ckpt:
                 zero_rank_log(logger, f"resume from global_step: {ckpt['global_step']}")
                 resume_global_step = ckpt["global_step"]
