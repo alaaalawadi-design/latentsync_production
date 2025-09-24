@@ -3,6 +3,7 @@ from blocks.lipsync_block import LibSyncBlock
 from blocks.preprocessing_block import PreProcessingBlock
 from blocks.postprocessing_block import PostProcessingBlock
 from blocks.frame_interpolation_block import FrameIntrpolationBlock
+from projectmanager import ProjectManager
 
 
 class App:
@@ -36,7 +37,8 @@ class App:
         
     def run(self, 
             ):
-
+        import time 
+        s_time = time.time()
         self.lipsync_block.execute(
             audio_path=self.project_manager.audio_path,
             video_out_path=self.project_manager.results_dir / "output.mp4",
@@ -44,29 +46,57 @@ class App:
             guidance_scale=self.project_manager.guidance_scale
 
         )
-
-        if not self.is_first_video:
-            first_frame = self.lipsync_block.get_first_gen_frame()
-            intermediate_video1_path = self.project_manager.intermediate_videos_dir / "video1.mp4"
-            self.frame_interpolation_block.execute(self.last_silent_frame, first_frame, self.fps, save_path=intermediate_video1_path)
-        else:
-            self.is_first_video = False
-            intermediate_video1_path = None
+        e_time = time.time()
+        print("lipsyncblock",e_time-s_time)
 
 
-        last_frame = self.lipsync_block.get_last_gen_frame()
-        intermediate_video2_path = self.project_manager.intermediate_videos_dir / "video2.mp4"
-        self.frame_interpolation_block.execute(last_frame, self.first_silent_frame, self.fps, save_path=intermediate_video2_path) 
+        # if not self.is_first_video:
+        #     first_frame = self.lipsync_block.get_first_gen_frame()
+        #     intermediate_video1_path = self.project_manager.intermediate_videos_dir / "video1.mp4"
+        #     self.frame_interpolation_block.execute(self.last_silent_frame, first_frame, self.fps, save_path=intermediate_video1_path)
+        # else:
+        #     self.is_first_video = False
+        #     intermediate_video1_path = None
 
 
-        if intermediate_video1_path is not None:
-            videos = [intermediate_video1_path, self.project_manager.results_dir / "output.mp4", intermediate_video2_path, self.project_manager.silent_video_path]
-            speed_up_videos = [intermediate_video1_path, intermediate_video2_path]
-        else:
-            videos = [self.project_manager.results_dir / "output.mp4", intermediate_video2_path, self.project_manager.silent_video_path]
-            speed_up_videos = [intermediate_video2_path]
+        # last_frame = self.lipsync_block.get_last_gen_frame()
+        # intermediate_video2_path = self.project_manager.intermediate_videos_dir / "video2.mp4"
+        # self.frame_interpolation_block.execute(last_frame, self.first_silent_frame, self.fps, save_path=intermediate_video2_path) 
 
-        self.postprocessing_block.execute(videos, speed_up_videos, self.project_manager.results_dir / "final_output.mp4", 
-                                          self.project_manager.background_paths, self.project_manager.save_path)
-        self.cleanup()
 
+        # if intermediate_video1_path is not None:
+        #     videos = [intermediate_video1_path, self.project_manager.results_dir / "output.mp4", intermediate_video2_path, self.project_manager.silent_video_path]
+        #     speed_up_videos = [intermediate_video1_path, intermediate_video2_path]
+        # else:
+        #     videos = [self.project_manager.results_dir / "output.mp4", intermediate_video2_path, self.project_manager.silent_video_path]
+        #     speed_up_videos = [intermediate_video2_path]
+
+        # self.postprocessing_block.execute(videos, speed_up_videos, self.project_manager.results_dir / "final_output.mp4", 
+                             
+        # self.project_manager.background_paths, self.project_manager.save_path)
+
+        # self.cleanup()
+
+
+
+
+if __name__ == "__main__":
+    
+    base_dir=Path('.')
+    models_dir = Path('../checkpoints/')    
+    project_manager = ProjectManager(base_dir, models_dir)
+    lipsync_app = App(project_manager)
+    
+    
+    import time 
+    s_time = time.time()
+    audio_path = "../test_data/audios/Perfect_2_5_60s.wav"
+    save_path = "../test_data/results/test1/"
+    # backgrounds = ['morning', 'night', 'noon', 'sunset']
+    backgrounds = ['night']
+    project_manager.set_audio_path(audio_path)
+    project_manager.set_save_path(save_path)
+    project_manager.set_background_paths(backgrounds)
+    lipsync_app.run()    
+    e_time = time.time()
+    print(e_time-s_time)

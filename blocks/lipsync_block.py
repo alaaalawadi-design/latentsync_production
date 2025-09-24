@@ -63,7 +63,13 @@ class LibSyncBlock:
         else:    
             torch.seed()
 
+        import time 
+        s_time =  time.time()
         self.pipeline.prepare_ref_video(ref_video_path, saved_ref_video_data_path)
+        e_time = time.time() 
+        print("prepare_ref_video time ",e_time-s_time)
+
+        # self.pipeline.prepare_ref_video(ref_video_path, saved_ref_video_data_path)
             
     def execute(self, 
             audio_path, 
