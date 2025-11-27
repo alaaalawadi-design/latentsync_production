@@ -370,6 +370,7 @@ class LipsyncPipeline(DiffusionPipeline):
         self.set_ref_video_data(start=self.frame_pointer, end=total_frames+self.frame_pointer)
         self.set_pointer(self.frame_pointer+total_frames-5)
         
+
         for i in tqdm.tqdm(range(num_inferences), desc="Doing inference..."):
             start_idx = i * num_frames
             end_idx = min(start_idx + num_frames, total_frames)  
@@ -428,6 +429,7 @@ class LipsyncPipeline(DiffusionPipeline):
                 decoded_latents, pixel_values, 1 - masks, device, weight_dtype
             )
             synced_video_frames.append(decoded_latents)
+            
         synced_video_frames = self.restore_video(
             torch.cat(synced_video_frames), self.original_video_frames, self.boxes, self.affine_matrices
         )
@@ -436,6 +438,10 @@ class LipsyncPipeline(DiffusionPipeline):
         command = f"ffmpeg -y -loglevel error -nostdin -i {os.path.join(temp_dir, 'video.mp4')} -i {tmp_audio_path} -c:v libx264 -c:a aac -q:v 0 -q:a 0 {video_out_path}"
         subprocess.run(command, shell=True)
         return synced_video_frames[5, :, :, :], synced_video_frames[-1, :, :, :]
+
+
+
+
 
 
     def prepare_ref_video(self, video_path, saved_video_data_path):
