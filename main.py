@@ -85,12 +85,12 @@ if __name__ == "__main__":
     import time 
     s_time = time.time()
     audio_path = "../test_data/audios/Perfect_2_5_60s.wav"
-    save_path = "../test_data/results/test1/"
+    save_path = "../test_data/res2thverstion/"
     # backgrounds = ['morning', 'night', 'noon', 'sunset']
-    backgrounds = ['morning']
+    backgrounds = ['sunset']
     project_manager.set_audio_path(audio_path)
     project_manager.set_save_path(save_path)
     project_manager.set_background_paths(backgrounds)
     lipsync_app.run()    
     e_time = time.time()
-    print(e_time-s_time)
+    print( "lipsync time", e_time-s_time)

@@ -5,5 +5,89 @@ data/ref_videos/ref_frames_data.pkl
 data/intermediate_videos/**
 data/results/**
 data/tmp/**
+# -----------------------------
+# General
+# -----------------------------
+*.log
+*.tmp
+*.cache
+
+# -----------------------------
+# Videos
+# -----------------------------
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+
+# -----------------------------
+# Images
+# -----------------------------
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.tiff
+*.gif
+*.webp
+
+# -----------------------------
+# Audio
+# -----------------------------
+*.wav
+*.mp3
+*.flac
+*.aac
+
+# -----------------------------
+# Machine Learning Checkpoints
+# -----------------------------
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.pkl
+*.npz
+
+# HuggingFace / Model Hub caches
+huggingface/
+models/
+checkpoints/
+weights/
+*.onnx
+*.engine
+
+# Datasets
+data/
+datasets/
+raw_data/
+*.csv
+*.tsv
+
+# Generated outputs
+outputs/
+inference_output/
+result/
+results/
+*.npy
+*.npz
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+env/
+venv/
+.lipsync_env/
+lipsync_env/
+*.egg-info/
+
+# Temp or intermediate dirs
+tmp/
+temp/
+cache/
 file.txt
 data/ref_videos/silent_standard.mp4
