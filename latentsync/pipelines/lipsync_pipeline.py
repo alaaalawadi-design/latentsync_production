@@ -21,6 +21,7 @@ import numpy as np
 import torch
 from einops import rearrange
 
+from diffusers.schedulers import DPMSolverMultistepScheduler
 
 
 from diffusers.schedulers import (
@@ -56,14 +57,17 @@ class LipsyncPipeline(DiffusionPipeline):
         vae: AutoencoderKL,
         audio_encoder: Audio2Feature,
         unet: UNet3DConditionModel,
-        scheduler: Union[
-            DDIMScheduler,
-            PNDMScheduler,
-            LMSDiscreteScheduler,
-            EulerDiscreteScheduler,
-            EulerAncestralDiscreteScheduler,
-            DPMSolverMultistepScheduler,
-        ],
+        # scheduler: Union[
+        #     DDIMScheduler,
+        #     PNDMScheduler,
+        #     LMSDiscreteScheduler,
+        #     EulerDiscreteScheduler,
+        #     EulerAncestralDiscreteScheduler,
+        #     DPMSolverMultistepScheduler,
+        # ],
+        scheduler: DPMSolverMultistepScheduler,
+
+
         image_processor
     ):
 
@@ -468,7 +472,10 @@ class LipsyncPipeline(DiffusionPipeline):
             
             with self.progress_bar(total=num_inference_steps) as progress_bar:
                 for j, t in enumerate(timesteps):
+
                     latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
+                   
+                   
                     latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
                     latent_model_input = torch.cat(
                         [latent_model_input, mask_latents, masked_image_latents, image_latents], dim=1

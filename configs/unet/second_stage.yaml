@@ -28,7 +28,7 @@ run:
   recon_loss_weight: 1 # 1
   guidance_scale: 1.0 # 1.5 or 1.0
   trepa_loss_weight: 10
-  inference_steps: 20
+  inference_steps: 10
   seed: 1247
   use_mixed_noise: true
   mixed_noise_alpha: 1 # 1
@@ -78,6 +78,7 @@ model:
   norm_eps: 1e-5
   norm_num_groups: 32
   out_channels: 4 # 16
+  # sample_size: 256
   sample_size: 64
   resnet_time_scale_shift: default # Choose between [default, scale_shift]
   unet_use_cross_frame_attention: false
@@ -101,3 +102,4 @@ model:
     temporal_position_encoding_max_len: 16
     temporal_attention_dim_div: 1
     zero_initialize: true
+
