@@ -93,7 +93,7 @@ if __name__ == "__main__":
     import time 
     s_time = time.time()
     audio_path = "/home/administrator/disk2/alaa/GeneAI2/latentsync_production/test_data/audios/Perfect_2_5_60s.wav"
-    save_path = "/home/administrator/disk2/alaa/GeneAI2/latentsync_production/test_data/result1stversion"
+    save_path = "/home/administrator/disk2/alaa/GeneAI2/latentsync_production/cysync"
     # backgrounds = ['morning', 'night', 'noon', 'sunset']
     backgrounds = ['sunset']
     project_manager.set_audio_path(audio_path)
