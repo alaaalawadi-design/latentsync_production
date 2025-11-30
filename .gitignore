@@ -91,3 +91,13 @@ temp/
 cache/
 file.txt
 data/ref_videos/silent_standard.mp4
+
+
+# -----------------------------
+# Archives
+# -----------------------------
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2
+*.rar
