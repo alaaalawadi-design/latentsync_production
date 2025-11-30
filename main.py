@@ -38,6 +38,7 @@ class App:
     def run(self, 
             ):
 
+        ltime = time.time()
         self.lipsync_block.execute(
             audio_path=self.project_manager.audio_path,
             video_out_path=self.project_manager.results_dir / "output.mp4",
@@ -45,6 +46,9 @@ class App:
             guidance_scale=self.project_manager.guidance_scale
 
         )
+        letime = time.time()
+        print("lipsyncblock" , letime - ltime)
+
 
         if not self.is_first_video:
             first_frame = self.lipsync_block.get_first_gen_frame()
@@ -93,4 +97,4 @@ if __name__ == "__main__":
     project_manager.set_background_paths(backgrounds)
     lipsync_app.run()    
     e_time = time.time()
-    print( "lipsync time", e_time-s_time)
+    print( "all lipsync time with save ", e_time-s_time)

@@ -82,7 +82,7 @@ class LibSyncBlock:
         self.pipeline.prepare_ref_video(ref_video_path, saved_ref_video_data_path)
         e_time = time.time()
         prepvideitime= e_time -s_time
-        print( "preparevideo time", prepvideitime)   
+        print( "All_lipsync_time", prepvideitime)   
 
 
     def execute(self, 
