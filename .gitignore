@@ -101,3 +101,123 @@ data/ref_videos/silent_standard.mp4
 *.tar.gz
 *.tar.bz2
 *.rar
+
+
+
+
+# =========================================================
+# GENERAL
+# =========================================================
+*.log
+*.tmp
+*.cache
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+.lipsync_env/
+lipsync_env/
+*.egg-info/
+
+# Temp folders
+tmp/
+temp/
+cache/
+
+# =========================================================
+# MEDIA FILES (videos, images, audio)
+# Prevents push errors from large binary files
+# =========================================================
+
+# Video
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+*.flv
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.tiff
+*.gif
+*.webp
+
+# Audio
+*.wav
+*.mp3
+*.flac
+*.aac
+*.m4a
+*.ogg
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2
+*.rar
+*.7z
+
+# =========================================================
+# MACHINE LEARNING MODELS & FILES
+# (Models, layers, ONNX, checkpoints, safetensors, pkl, etc.)
+# These MUST NEVER be in GitHub (100MB limit)
+# =========================================================
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.pkl
+*.npz
+*.npy
+*.onnx
+*.engine
+*.h5
+*.tflite
+
+# HuggingFace / Model hub caches
+huggingface/
+hf_cache/
+models/
+model_cache/
+checkpoints/
+weights/
+
+# =========================================================
+# DATASETS
+# Prevent accidental upload of massive datasets
+# =========================================================
+data/
+datasets/
+raw_data/
+training_data/
+*.csv
+*.tsv
+*.jsonl
+
+# =========================================================
+# GENERATED OUTPUTS
+# Anything produced during inference or processing
+# =========================================================
+outputs/
+output/
+results/
+result/
+inference_output/
+inference/
+runs/
+logs/
+export/
+exported/
+generated/
