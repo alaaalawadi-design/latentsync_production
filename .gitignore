@@ -7,3 +7,9 @@ data/results/**
 data/tmp/**
 file.txt
 data/ref_videos/silent_standard.mp4
+
+
+latentsync/utils/checkpoints/
+data/backgrounds/*.mp4
+*.onnx
+*.zip
