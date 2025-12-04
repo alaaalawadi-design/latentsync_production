@@ -13,3 +13,5 @@ latentsync/utils/checkpoints/
 data/backgrounds/*.mp4
 *.onnx
 *.zip
+*.mp4 
+
