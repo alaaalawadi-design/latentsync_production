@@ -30,7 +30,6 @@ data/tmp/**
 
 # HuggingFace / Model Hub caches
 huggingface/
-models/
 checkpoints/
 weights/
 *.onnx
