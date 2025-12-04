@@ -343,3 +343,4 @@ if __name__ == "__main__":
 
     # masked_face = (rearrange(masked_face, "c h w -> h w c").detach().cpu().numpy()).astype(np.uint8)
     # cv2.imwrite("masked_face.jpg", masked_face)
+
