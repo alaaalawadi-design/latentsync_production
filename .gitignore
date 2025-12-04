@@ -16,29 +16,6 @@ data/tmp/**
 # Videos
 # -----------------------------
 *.mp4
-*.avi
-*.mov
-*.mkv
-*.webm
-
-# -----------------------------
-# Images
-# -----------------------------
-*.png
-*.jpg
-*.jpeg
-*.bmp
-*.tiff
-*.gif
-*.webp
-
-# -----------------------------
-# Audio
-# -----------------------------
-*.wav
-*.mp3
-*.flac
-*.aac
 
 # -----------------------------
 # Machine Learning Checkpoints
@@ -59,31 +36,6 @@ weights/
 *.onnx
 *.engine
 
-# Datasets
-data/
-datasets/
-raw_data/
-*.csv
-*.tsv
-
-# Generated outputs
-outputs/
-inference_output/
-result/
-results/
-*.npy
-*.npz
-
-# Python cache
-__pycache__/
-*.pyc
-
-# Virtual environments
-env/
-venv/
-.lipsync_env/
-lipsync_env/
-*.egg-info/
 
 # Temp or intermediate dirs
 tmp/
