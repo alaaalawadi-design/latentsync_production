@@ -38,7 +38,6 @@ class App:
     def run(self, 
             ):
 
-        ltime = time.time()
         self.lipsync_block.execute(
             audio_path=self.project_manager.audio_path,
             video_out_path=self.project_manager.results_dir / "output.mp4",
@@ -46,9 +45,7 @@ class App:
             guidance_scale=self.project_manager.guidance_scale
 
         )
-        letime = time.time()
-        print("lipsyncblock" , letime - ltime)
-
+        
 
         if not self.is_first_video:
             first_frame = self.lipsync_block.get_first_gen_frame()
@@ -78,23 +75,23 @@ class App:
 
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     
-    base_dir=Path('.')
-    models_dir = Path('../checkpoints/')    
-    project_manager = ProjectManager(base_dir, models_dir)
-    lipsync_app = App(project_manager)
+    # base_dir=Path('.')
+    # models_dir = Path('../checkpoints/')    
+    # project_manager = ProjectManager(base_dir, models_dir)
+    # lipsync_app = App(project_manager)
     
     
-    import time 
-    s_time = time.time()
-    audio_path = "../test_data/audios/Perfect_2_5_60s.wav"
-    save_path = "/home/administrator/disk2/alaa/GeneAI2/latentsync_production/cysync/"
-    # backgrounds = ['morning', 'night', 'noon', 'sunset']
-    backgrounds = ['sunset']
-    project_manager.set_audio_path(audio_path)
-    project_manager.set_save_path(save_path)
-    project_manager.set_background_paths(backgrounds)
-    lipsync_app.run()    
-    e_time = time.time()
-    print( "all lipsync time with save ", e_time-s_time)
+    # import time 
+    # s_time = time.time()
+    # audio_path = "/home/administrator/disk2/alaa/GeneAI2/latentsync_production/test_data/ict_waves/4.wav"
+    # save_path = "/home/administrator/disk2/alaa/GeneAI2/latentsync_production/cysync/"
+    # # backgrounds = ['morning', 'night', 'noon', 'sunset']
+    # backgrounds = ['sunset']
+    # project_manager.set_audio_path(audio_path)
+    # project_manager.set_save_path(save_path)
+    # project_manager.set_background_paths(backgrounds)
+    # lipsync_app.run()    
+    # e_time = time.time()
+    # print( "all lipsync time with save ", e_time-s_time)
