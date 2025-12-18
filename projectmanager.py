@@ -24,7 +24,7 @@ class ProjectManager:
         self.whisper_small_model_path = self.models_dir / "whisper" / "small.pt"
         self.whisper_tiny_model_path = self.models_dir / "whisper" / "tiny.pt"
         self.detector_path = self.models_dir 
-        self.ref_video_path = self.data_dir / "ref_videos" / "ref_video.mp4"
+        self.ref_video_path = self.data_dir / "ref_videos" / "1.mp4"
         self.saved_ref_video_data_path = self.data_dir / "ref_videos" / "ref_frames_data.pkl"
         self.silent_video_path = self.data_dir / "ref_videos" / "silent.mp4" 
 
