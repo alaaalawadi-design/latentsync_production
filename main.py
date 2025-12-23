@@ -75,23 +75,23 @@ class App:
 
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
     
-    # base_dir=Path('.')
-    # models_dir = Path('../checkpoints/')    
-    # project_manager = ProjectManager(base_dir, models_dir)
-    # lipsync_app = App(project_manager)
+    base_dir=Path('.')
+    models_dir = Path('../checkpoints/')    
+    project_manager = ProjectManager(base_dir, models_dir)
+    lipsync_app = App(project_manager)
     
     
-    # import time 
-    # s_time = time.time()
-    # audio_path = "/home/administrator/disk2/alaa/GeneAI2/latentsync_production/test_data/ict_waves/4.wav"
-    # save_path = "/home/administrator/disk2/alaa/GeneAI2/latentsync_production/cysync/"
-    # # backgrounds = ['morning', 'night', 'noon', 'sunset']
-    # backgrounds = ['sunset']
-    # project_manager.set_audio_path(audio_path)
-    # project_manager.set_save_path(save_path)
-    # project_manager.set_background_paths(backgrounds)
-    # lipsync_app.run()    
-    # e_time = time.time()
-    # print( "all lipsync time with save ", e_time-s_time)
+    import time 
+    s_time = time.time()
+    audio_path = "/home/administrator/disk2/alaa/GeneAI2/latentsync_production/test_data/audios/Perfect_2_5.wav"
+    save_path = "/home/administrator/disk2/alaa/GeneAI2/latentsync_production/cysync/"
+    # backgrounds = ['morning', 'night', 'noon', 'sunset']
+    backgrounds = ['sunset']
+    project_manager.set_audio_path(audio_path)
+    project_manager.set_save_path(save_path)
+    project_manager.set_background_paths(backgrounds)
+    lipsync_app.run()    
+    e_time = time.time()
+    print( "all lipsync time with save ", e_time-s_time)
