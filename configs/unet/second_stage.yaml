@@ -1,4 +1,5 @@
 data:
+
   syncnet_config_path: configs/syncnet/syncnet_16_pixel.yaml
   train_output_dir: debug/unet
   train_fileslist: /mnt/bn/maliva-gen-ai-v2/chunyu.li/fileslist/all_data_v6.txt
@@ -23,12 +24,12 @@ ckpt:
 run:
   pixel_space_supervise: true
   use_syncnet: true
-  sync_loss_weight: 0.05 # 1/283
-  perceptual_loss_weight: 0.1 # 0.1
+  sync_loss_weight: 0.1 # 1/283
+  perceptual_loss_weight: 0.2 # 0.1
   recon_loss_weight: 1 # 1
   guidance_scale: 1.0 # 1.5 or 1.0
   trepa_loss_weight: 10
-  inference_steps: 8
+  inference_steps: 12
   seed: 1247
   use_mixed_noise: true
   mixed_noise_alpha: 1 # 1

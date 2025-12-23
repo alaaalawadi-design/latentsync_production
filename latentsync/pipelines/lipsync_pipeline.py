@@ -425,14 +425,16 @@ class LipsyncPipeline(DiffusionPipeline):
 
         self.set_ref_video_data(start=self.frame_pointer, end=total_frames+self.frame_pointer)
         
-        self.set_pointer(self.frame_pointer+total_frames-5)
+        self.set_pointer(self.frame_pointer+total_frames-4)
         
         for i in tqdm.tqdm(range(num_inferences), desc="Doing inference..."):
 
             start_idx = i * num_frames
             end_idx = min(start_idx + num_frames, total_frames)  
-            
-            
+                # ========== FIX: Reset scheduler state for each chunk ==========
+            self.scheduler.set_timesteps(num_inference_steps, device=device)
+            timesteps = self.scheduler.timesteps
+                    
             if self.unet.add_audio_layer:
                 audio_embeds = torch.stack(whisper_chunks[start_idx:end_idx])
                 audio_embeds = audio_embeds.to(device, dtype=weight_dtype)
@@ -471,24 +473,52 @@ class LipsyncPipeline(DiffusionPipeline):
             num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
             
             with self.progress_bar(total=num_inference_steps) as progress_bar:
-                for j, t in enumerate(timesteps):
+# 
+                # for j, t in enumerate(timesteps):
 
-                    latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
+                    # latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
                    
                    
-                    latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
-                    latent_model_input = torch.cat(
-                        [latent_model_input, mask_latents, masked_image_latents, image_latents], dim=1
+                    # latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
+                    # latent_model_input = torch.cat(
+                    #     [latent_model_input, mask_latents, masked_image_latents, image_latents], dim=1
+                    # )
+                    # noise_pred = self.unet(latent_model_input, t, encoder_hidden_states=audio_embeds).sample
+                    # if do_classifier_free_guidance:
+                    #     noise_pred_uncond, noise_pred_audio = noise_pred.chunk(2)
+                    #     noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_audio - noise_pred_uncond)
+                                # Denoising loop
+                for j, t in enumerate(timesteps):
+                    latent_in = torch.cat([latents] * 2, dim=0) if do_classifier_free_guidance else latents
+                    latent_in = self.scheduler.scale_model_input(latent_in, t)
+                    latent_in = torch.cat(
+                        [latent_in, mask_latents, masked_image_latents, image_latents],
+                        dim=1,
                     )
-                    noise_pred = self.unet(latent_model_input, t, encoder_hidden_states=audio_embeds).sample
+
+                    noise_pred = self.unet(
+                        latent_in, t, encoder_hidden_states=audio_embeds
+                    ).sample
+
                     if do_classifier_free_guidance:
-                        noise_pred_uncond, noise_pred_audio = noise_pred.chunk(2)
-                        noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_audio - noise_pred_uncond)
+                        print("hello error here ")
+                        half = noise_pred.shape[0] // 2
+                        noise_uncond, noise_text = noise_pred[:half], noise_pred[half:]
+                        noise_pred = noise_uncond + guidance_scale * (
+                            noise_text - noise_uncond
+                        )
+
+                    
                     latents = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs).prev_sample
+
+
                     if j == len(timesteps) - 1 or ((j + 1) > num_warmup_steps and (j + 1) % self.scheduler.order == 0):
                         progress_bar.update()
                         if callback is not None and j % callback_steps == 0:
                             callback(j, t, latents)
+
+
+
             decoded_latents = self.decode_latents(latents)
             decoded_latents = self.paste_surrounding_pixels_back(
                 decoded_latents, pixel_values, 1 - masks, device, weight_dtype
@@ -524,7 +554,7 @@ class LipsyncPipeline(DiffusionPipeline):
 
     def add_silent_to_audio(self, audio_path, audio_sample_rate, tmp_audio_path):
         audio = AudioSegment.from_file(audio_path, format="wav")
-        number_of_samples = 4480
+        number_of_samples = 2560
         duration_of_silence = (1000 * number_of_samples) / audio_sample_rate  
         silent_segment = AudioSegment.silent(duration=duration_of_silence, frame_rate=audio_sample_rate)
         new_audio = silent_segment + audio

@@ -1,0 +1,2 @@
+file '/home/administrator/disk2/alaa/GeneAI2/latentsync_production/cysync/data/ref_videos/data_tests/Wanimate_00006_25fps.mp4'
+file '/home/administrator/disk2/alaa/GeneAI2/latentsync_production/cysync/data/ref_videos/data_tests/ref_video_connection_25fps.mp4'

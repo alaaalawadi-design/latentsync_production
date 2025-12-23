@@ -1,9 +1,9 @@
 import torch
 from torch.optim import AdamW
-from interpolation.model.warplayer import warp
+from model.warplayer import warp
 from torch.nn.parallel import DistributedDataParallel as DDP
-from interpolation.train_log.IFNet_HDv3 import *
-from interpolation.model.loss import *
+from train_log.IFNet_HDv3 import *
+from model.loss import *
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     

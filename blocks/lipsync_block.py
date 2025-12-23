@@ -2,7 +2,7 @@ from omegaconf import OmegaConf
 import torch
 import os 
 import cv2
-from diffusers import AutoencoderKL, DDIMScheduler
+from diffusers import AutoencoderKL, DDIMScheduler , DPMSolverMultistepScheduler
 from latentsync.models.unet import UNet3DConditionModel
 from latentsync.pipelines.lipsync_pipeline import LipsyncPipeline
 from diffusers.utils.import_utils import is_xformers_available
@@ -26,7 +26,7 @@ class LibSyncBlock:
                 ):
     
         configs_dir = os.path.join(base_dir, "configs")
-        scheduler = DDIMScheduler.from_pretrained(configs_dir)
+        scheduler = DPMSolverMultistepScheduler.from_pretrained(configs_dir)
         
         try:
             if not os.path.exists(unet_config_path):
