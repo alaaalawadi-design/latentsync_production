@@ -2,7 +2,7 @@ from pathlib import Path
 from blocks.lipsync_block import LibSyncBlock
 from blocks.preprocessing_block import PreProcessingBlock
 from blocks.postprocessing_block import PostProcessingBlock
-# from blocks.frame_interpolation_block import FrameIntrpolationBlock
+from blocks.frame_interpolation_block import FrameIntrpolationBlock
 from projectmanager import ProjectManager
 
 class App:
@@ -26,14 +26,14 @@ class App:
                                           self.project_manager.device, 
                                           self.project_manager.seed
                                           )
-        # self.frame_interpolation_block = FrameIntrpolationBlock(self.project_manager.models_dir)
-    #     self.postprocessing_block = PostProcessingBlock()
-    #     self.first_silent_frame, self.last_silent_frame = self.preprocessing_block.get_first_last_frames(self.project_manager.silent_video_path)
+        self.frame_interpolation_block = FrameIntrpolationBlock(self.project_manager.models_dir)
+        self.postprocessing_block = PostProcessingBlock()
+        self.first_silent_frame, self.last_silent_frame = self.preprocessing_block.get_first_last_frames(self.project_manager.silent_video_path)
         
         
-    # def cleanup(self):
-    #     for dir in [self.project_manager.results_dir, self.project_manager.intermediate_videos_dir, self.project_manager.tmp_dir]:
-    #         self.project_manager.clean_dir(dir)
+    def cleanup(self):
+        for dir in [self.project_manager.results_dir, self.project_manager.intermediate_videos_dir, self.project_manager.tmp_dir]:
+            self.project_manager.clean_dir(dir)
         
     def run(self, 
             ):
@@ -47,30 +47,30 @@ class App:
         )
         
 
-    #     if not self.is_first_video:
-    #         first_frame = self.lipsync_block.get_first_gen_frame()
-    #         intermediate_video1_path = self.project_manager.intermediate_videos_dir / "video1.mp4"
-    #         self.frame_interpolation_block.execute(self.last_silent_frame, first_frame, self.fps, save_path=intermediate_video1_path)
-    #     else:
-    #         self.is_first_video = False
-    #         intermediate_video1_path = None
+        if not self.is_first_video:
+            first_frame = self.lipsync_block.get_first_gen_frame()
+            intermediate_video1_path = self.project_manager.intermediate_videos_dir / "video1.mp4"
+            self.frame_interpolation_block.execute(self.last_silent_frame, first_frame, self.fps, save_path=intermediate_video1_path)
+        else:
+            self.is_first_video = False
+            intermediate_video1_path = None
 
 
-    #     last_frame = self.lipsync_block.get_last_gen_frame()
-    #     intermediate_video2_path = self.project_manager.intermediate_videos_dir / "video2.mp4"
-    #     self.frame_interpolation_block.execute(last_frame, self.first_silent_frame, self.fps, save_path=intermediate_video2_path) 
+        last_frame = self.lipsync_block.get_last_gen_frame()
+        intermediate_video2_path = self.project_manager.intermediate_videos_dir / "video2.mp4"
+        self.frame_interpolation_block.execute(last_frame, self.first_silent_frame, self.fps, save_path=intermediate_video2_path) 
 
 
-    #     if intermediate_video1_path is not None:
-    #         videos = [intermediate_video1_path, self.project_manager.results_dir / "output.mp4", intermediate_video2_path, self.project_manager.silent_video_path]
-    #         speed_up_videos = [intermediate_video1_path, intermediate_video2_path]
-    #     else:
-    #         videos = [self.project_manager.results_dir / "output.mp4", intermediate_video2_path, self.project_manager.silent_video_path]
-    #         speed_up_videos = [intermediate_video2_path]
+        if intermediate_video1_path is not None:
+            videos = [intermediate_video1_path, self.project_manager.results_dir / "output.mp4", intermediate_video2_path, self.project_manager.silent_video_path]
+            speed_up_videos = [intermediate_video1_path, intermediate_video2_path]
+        else:
+            videos = [self.project_manager.results_dir / "output.mp4", intermediate_video2_path, self.project_manager.silent_video_path]
+            speed_up_videos = [intermediate_video2_path]
 
-    #     self.postprocessing_block.execute(videos, speed_up_videos, self.project_manager.results_dir / "final_output.mp4", 
-    #                                       self.project_manager.background_paths, self.project_manager.save_path)
-    #     self.cleanup()
+        self.postprocessing_block.execute(videos, speed_up_videos, self.project_manager.results_dir / "final_output.mp4", 
+                                          self.project_manager.background_paths, self.project_manager.save_path)
+        self.cleanup()
 
 
 

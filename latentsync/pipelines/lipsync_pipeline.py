@@ -501,7 +501,7 @@ class LipsyncPipeline(DiffusionPipeline):
                     ).sample
 
                     if do_classifier_free_guidance:
-                        print("hello error here ")
+                        # print("hello error here ")
                         half = noise_pred.shape[0] // 2
                         noise_uncond, noise_text = noise_pred[:half], noise_pred[half:]
                         noise_pred = noise_uncond + guidance_scale * (
